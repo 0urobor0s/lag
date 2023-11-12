@@ -38,4 +38,35 @@ defmodule LAG.NxBackend do
   defnp laplacian_matrix_n(adjacency_matrix) do
     degree_matrix_n(adjacency_matrix) - adjacency_matrix
   end
+
+  defn algebraic_connectivity(adjacency_matrix) do
+    laplacian_matrix = laplacian_matrix_n(adjacency_matrix)
+    {eigenvals, _eigenvecs} = Nx.LinAlg.eigh(laplacian_matrix)
+    zero_i = Nx.argmin(eigenvals) |> Nx.new_axis(0)
+
+    eigenvals
+    |> eigenvals_fiedler_update(zero_i)
+    |> Nx.reduce_min()
+  end
+
+  defn fiedler_vector(adjacency_matrix) do
+    laplacian_matrix = laplacian_matrix_n(adjacency_matrix)
+    {eigenvals, eigenvecs} = Nx.LinAlg.eigh(laplacian_matrix)
+    zero_i = Nx.argmin(eigenvals) |> Nx.new_axis(0)
+    index = Nx.argmin(eigenvals_fiedler_update(eigenvals, zero_i))
+
+    eigenvecs[[0..-1//1, index]]
+  end
+
+  defn connected(adjacency_matrix) do
+    adjacency_matrix
+    |> laplacian_matrix_n()
+    |> algebraic_connectivity()
+    |> Nx.greater(0)
+  end
+
+  defnp eigenvals_fiedler_update(eigenvals, index) do
+    # Can be any value greater than 1
+    Nx.indexed_put(eigenvals, index, Nx.tensor(2))
+  end
 end
