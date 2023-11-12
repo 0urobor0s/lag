@@ -11,6 +11,10 @@ defmodule LAG do
     impl!(graph).degree_matrix(graph)
   end
 
+  def laplacian_matrix(%Graph{} = graph) do
+    impl!(graph).laplacian_matrix(graph)
+  end
+
   def default_backend() do
     Process.get(backend_pdict_key()) || backend!(Application.fetch_env!(:lag, :default_backend))
   end
