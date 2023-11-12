@@ -30,4 +30,12 @@ defmodule LAG.NxBackend do
     |> Nx.sum(axes: [1])
     |> Nx.make_diagonal()
   end
+
+  deftransform laplacian_matrix(%Graph{} = graph) do
+    laplacian_matrix_n(graph.adjacency_matrix)
+  end
+
+  defnp laplacian_matrix_n(adjacency_matrix) do
+    degree_matrix_n(adjacency_matrix) - adjacency_matrix
+  end
 end
