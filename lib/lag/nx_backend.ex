@@ -19,7 +19,7 @@ defmodule LAG.NxBackend do
       |> Nx.as_type(vertices.type)
   end
 
-  defnp modified_incidence_matrix_n(adjacency_matrix) do
+  defnp modified_adjacency_matrix_n(adjacency_matrix) do
     # Should check if the value is `Nx.Constants.max_finite(Nx.type(adjacency_matrix))`
     # and warn accordingly
     max = Nx.sum(adjacency_matrix) + 1
@@ -33,7 +33,7 @@ defmodule LAG.NxBackend do
   # Min-plus matrix multiplication, also known as min-plus products or distance product.
   deftransform min_plus_dot(%Graph{} = graph) do
     graph.adjacency_matrix
-    |> modified_incidence_matrix_n()
+    |> modified_adjacency_matrix_n()
     |> min_plus_dot_n()
   end
 
@@ -57,7 +57,7 @@ defmodule LAG.NxBackend do
 
   deftransform diamond_pow(%Graph{} = graph, k) do
     k_tensor = Nx.broadcast(0, {k})
-    a = modified_incidence_matrix_n(graph.adjacency_matrix)
+    a = modified_adjacency_matrix_n(graph.adjacency_matrix)
     diamond_pow_n(a, k_tensor)
   end
 
@@ -91,7 +91,7 @@ defmodule LAG.NxBackend do
   defnp diamond_pow_2r_n(adjacency_matrix, r_tensor) do
     {n, _} = Nx.shape(adjacency_matrix)
     {r} = Nx.shape(r_tensor)
-    inc = modified_incidence_matrix_n(adjacency_matrix)
+    inc = modified_adjacency_matrix_n(adjacency_matrix)
 
     while {bn = inc, dr = Nx.broadcast(0, {r, n, n})}, i <- 0..(r - 1) do
       {bn, dn} = min_plus_dot_n(bn)
