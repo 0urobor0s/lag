@@ -75,6 +75,19 @@ defmodule LAG.Graph do
         ]
       >>
 
+      iex> vertices = ["a", "b", "c"]
+      iex> edges = [["a", "b"], ["b", "c"], ["c", "a"]]
+      iex> weights = [1, 2, 1]
+      iex> LAG.Graph.new(vertices, edges, type: :directed, weights: weights)
+      #LAG.Graph<type: directed, vertices: ["a", "b", "c"], edges: [["a", "b"], ["b", "c"], ["c", "a"]], adjacency_matrix: #Nx.Tensor<
+        s64[3][3]
+        [
+          [0, 1, 0],
+          [0, 0, 2],
+          [1, 0, 0]
+        ]
+      >>
+
   """
 
   def new(vertices, edges, opts \\ [])

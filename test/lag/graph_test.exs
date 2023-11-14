@@ -120,5 +120,42 @@ defmodule LAG.GraphTest do
       assert g.vertices.map == map
       assert Nx.equal(g.adjacency_matrix, adjacency_matrix) |> Nx.all() |> Nx.to_number()
     end
+
+    test "directed graph with weights" do
+      vertices = ["a", "b", "c", "d", "e", "f", "g", "h"]
+
+      edges = [
+        ["a", "b"],
+        ["b", "c"],
+        ["b", "e"],
+        ["b", "f"],
+        ["c", "d"],
+        ["c", "g"],
+        ["d", "c"],
+        ["d", "h"],
+        ["e", "f"],
+        ["f", "g"],
+        ["g", "f"],
+        ["g", "h"]
+      ]
+
+      weights = Enum.to_list(1..12)
+
+      g = LAG.Graph.new(vertices, edges, type: :directed, weights: weights)
+
+      adjacency_matrix =
+        Nx.tensor([
+          [0, 1, 0, 0, 0, 0, 0, 0],
+          [0, 0, 2, 0, 3, 4, 0, 0],
+          [0, 0, 0, 5, 0, 0, 6, 0],
+          [0, 0, 7, 0, 0, 0, 0, 8],
+          [0, 0, 0, 0, 0, 9, 0, 0],
+          [0, 0, 0, 0, 0, 0, 10, 0],
+          [0, 0, 0, 0, 0, 11, 0, 12],
+          [0, 0, 0, 0, 0, 0, 0, 0]
+        ])
+
+      assert Nx.equal(g.adjacency_matrix, adjacency_matrix) |> Nx.all() |> Nx.to_number()
+    end
   end
 end
