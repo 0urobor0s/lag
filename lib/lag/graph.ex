@@ -87,7 +87,6 @@ defmodule LAG.Graph do
           [1, 0, 0]
         ]
       >>
-
   """
 
   def new(vertices, edges, opts \\ [])
