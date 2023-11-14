@@ -32,6 +32,7 @@ defmodule LAG.MixProject do
     [
       {:nx, "~> 0.6"},
       # {:nx, github: "elixir-nx/nx", sparse: "nx", override: true, branch: "v0.6"},
+      {:nimble_options, "~> 1.0"},
       {:exla, "~> 0.6", optional: true},
       {:ex_doc, "~> 0.30", only: :dev, runtime: false},
       {:benchee, "~> 1.0", only: :dev}
