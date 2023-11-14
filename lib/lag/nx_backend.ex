@@ -5,18 +5,31 @@ defmodule LAG.NxBackend do
 
   @behaviour LAG.Backend
 
-  defn adjacency_matrix(vertices, edges, _opts) do
-    {vertex_n} = Nx.shape(vertices)
+  defn adjacency_matrix(vertices, edges, opts) do
     {edge_n, _} = Nx.shape(edges)
-    # edges_inv = Nx.tile(edges, [2])[[0..-1//1, 1..2]]
-    edges_inv = Nx.reverse(edges)
+    adjacency_matrix(vertices, edges, Nx.broadcast(1, {edge_n}), opts)
+  end
 
-    _adjm =
+  defn adjacency_matrix(vertices, edges, weights, opts) do
+    {vertex_n} = Nx.shape(vertices)
+    # {edge_n, _} = Nx.shape(edges)
+    # {weights_n} = Nx.shape(weights)
+    # assert edge_n == weights_n
+
+    adjm =
       Nx.broadcast(0, {vertex_n, vertex_n})
-      |> Nx.indexed_put(edges, Nx.broadcast(1, {edge_n}))
-      |> Nx.indexed_put(edges_inv, Nx.broadcast(1, {edge_n}))
-      # Remove when support for weighted edges is added
-      |> Nx.as_type(vertices.type)
+      |> Nx.indexed_put(edges, weights)
+
+    case opts[:type] do
+      :undirected ->
+        edges_inv = Nx.reverse(edges)
+        weights_inv = Nx.reverse(weights)
+
+        Nx.indexed_put(adjm, edges_inv, weights_inv)
+
+      :directed ->
+        adjm
+    end
   end
 
   defnp modified_adjacency_matrix_n(adjacency_matrix) do
