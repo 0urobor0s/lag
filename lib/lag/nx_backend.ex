@@ -113,6 +113,50 @@ defmodule LAG.NxBackend do
     end
   end
 
+  def shortest_path(%Graph{} = graph, a, b, _opts \\ []) do
+    a = Map.fetch!(graph.vertices.map, a)
+    b = Map.fetch!(graph.vertices.map, b)
+
+    graph
+    |> shortest_path_r(a, b)
+    |> Graph.index_to_map(graph)
+  end
+
+  defp shortest_path_r(graph, a, b) do
+    edge =
+      graph.adjacency_matrix
+      |> Nx.slice([a, b], [1, 1])
+      |> Nx.squeeze()
+      |> Nx.to_number()
+
+    if edge != 0 do
+      if a == b do
+        [a]
+      else
+        [a, b]
+      end
+    else
+      {_, dr} = diamond_pow_2r(graph)
+      {r, _, _} = Nx.shape(dr)
+      r = r - 1
+      k = Nx.slice(dr, [r, a, b], [1, 1, 1]) |> Nx.squeeze() |> Nx.to_number()
+
+      ([a] ++ shortest_path_a(dr, a, k, r - 1) ++ shortest_path_a(dr, k, b, r - 1) ++ [b])
+      |> Enum.uniq()
+      |> shortest_path_l()
+    end
+  end
+
+  defp shortest_path_l(path) when length(path) > 2, do: path
+  defp shortest_path_l(_path), do: []
+
+  defp shortest_path_a(_, _, _, -1), do: []
+
+  defp shortest_path_a(dr, a, b, r) do
+    k = Nx.slice(dr, [r, a, b], [1, 1, 1]) |> Nx.squeeze() |> Nx.to_number()
+    shortest_path_a(dr, a, k, r - 1) ++ [k] ++ shortest_path_a(dr, k, b, r - 1)
+  end
+
   # Currently no self node edge is support as it should count twice
   @impl true
   deftransform degree_matrix(%Graph{} = graph) do
