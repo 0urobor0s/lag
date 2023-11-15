@@ -23,7 +23,8 @@ defmodule LAG.GraphFixtures do
         ["e", "f"],
         ["f", "g"],
         ["g", "f"],
-        ["g", "h"]
+        ["g", "h"],
+        ["h", "h"]
       ],
       opts: []
     })
