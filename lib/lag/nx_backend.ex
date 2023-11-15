@@ -157,6 +157,17 @@ defmodule LAG.NxBackend do
     shortest_path_a(dr, a, k, r - 1) ++ [k] ++ shortest_path_a(dr, k, b, r - 1)
   end
 
+  def all_pairs_shortest_path(%Graph{} = graph, opts \\ []) do
+    graph
+    |> permutations()
+    |> Enum.into(%{}, fn [a, b] = l -> {l, shortest_path(graph, a, b, opts)} end)
+  end
+
+  def permutations(graph) do
+    vertices = Map.keys(graph.vertices.map)
+    for a <- vertices, b <- vertices, do: [a, b]
+  end
+
   # Currently no self node edge is support as it should count twice
   @impl true
   deftransform degree_matrix(%Graph{} = graph) do
